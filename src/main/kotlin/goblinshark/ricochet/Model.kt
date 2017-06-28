@@ -35,38 +35,6 @@ class EmptyBoard(val wallsPerRow:Array<Array<Boolean>>,
         return EmptyBoard(rotateColToRow(wallsPerCol), rotateRowToCol(wallsPerRow), rotateTargets())
     }
 
-    override fun toString(): String {
-        val hWallStr = "═"
-        val hLineStr = "┈"
-        val vWallStr = "║"
-        val vLineStr = "┊"
-        val targetStr = "@"
-        val cellStr = " "
-        val intersectionStr = " "
-        val sb:StringBuilder = StringBuilder()
-        val numLines = wallsPerCol[0].size + wallsPerRow.size
-        val numChars = wallsPerRow[0].size + wallsPerCol.size
-        for (i in numLines - 1 downTo 0) {
-            for (j in 0..numChars - 1) {
-                if (i % 2 == 0) {  // Walls in cols
-                    if (j % 2 == 0) {
-                        sb.append(intersectionStr)
-                    } else {
-                        sb.append(if (wallsPerCol[j/2][i/2]) hWallStr else hLineStr)
-                    }
-                } else if (i % 2 == 1){  // Walls in rows
-                    if (j % 2 == 0) {
-                        sb.append(if (wallsPerRow[i/2][j/2]) vWallStr else vLineStr)
-                    } else {
-                        sb.append(if(targets.containsKey(Coord(j/2, i/2))) targetStr else cellStr)
-                    }
-                }
-            }
-            sb.append("\n")
-        }
-        return sb.toString()
-    }
-
     private fun rotateColToRow(input: Array<Array<Boolean>>): Array<Array<Boolean>> {
         // Need to initialize the whole array before setting anything, to be sure we stay in bounds.
         val result = Array(input.size, { Array(input[0].size, { false }) })
