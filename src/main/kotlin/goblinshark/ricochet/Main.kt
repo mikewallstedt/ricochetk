@@ -9,5 +9,7 @@ fun main(args: Array<String>) {
         Coord(5, 14) to Robot(Color.YELLOW),
         Coord(1, 14) to Robot(Color.BLACK)
     )
-    
+    val state = GameState(b, robot)
+
+    print(ShowBoard(state))
 }
