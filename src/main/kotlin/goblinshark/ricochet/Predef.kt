@@ -206,8 +206,3 @@ class BoardBuilder(val northWest: Quadrant, val northEast: Quadrant,
         return EmptyBoard(newWallsPerRow, newWallsPerCol, newTargets)
     }
 }
-
-fun main(args: Array<String>) {
-    val b: EmptyBoard = BoardBuilder(SIMPLE_BLUE_MOON, SIMPLE_BLUE_PLANET, SIMPLE_BLUE_STAR, SIMPLE_BLUE_SUN).Build()
-    print(b)
-}
