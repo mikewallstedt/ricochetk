@@ -12,4 +12,17 @@ fun main(args: Array<String>) {
     val state = GameState(b, robot)
 
     print(ShowBoard(state))
+
+    for (c in state.board.targets.keys) {
+//        if (!Target(Symbol.PLANET, Color.BLUE).equals(state.board.targets[c])) {
+//            continue
+//        }
+        val start = System.currentTimeMillis()
+        println(state.board.targets[c])
+        val solver = BreadFirstSolver(8)
+        val solution = solver.Solve(state, c)
+        solution?.forEach { println("  " + it) }
+        println(String.format("%dms", System.currentTimeMillis() - start))
+        println("")
+    }
 }

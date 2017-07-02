@@ -4,12 +4,18 @@ enum class Color {
     BLACK, BLUE, GREEN, RED, YELLOW, WILD;
 }
 
-data class Coord(val x:Int, val y:Int)
+data class Coord(val x:Int, val y:Int) {
+    fun move(d: Direction): Coord {
+        return Coord(x + d.x, y + d.y)
+    }
+}
 
 // Assumes coordinate system with origin in lower-left.
 enum class Direction(val x:Int, val y:Int) {
-    LEFT(-1, 0), RIGHT(1, 0), UP(1, 0), DOWN(-1, 0)
+    LEFT(-1, 0), RIGHT(1, 0), UP(0, 1), DOWN(0, -1)
 }
+
+data class Move(val robot:Robot, val direction: Direction, val numCells:Int)
 
 enum class Symbol {
     PLANET, MOON, STAR, SUN, BLACK_HOLE
@@ -62,12 +68,18 @@ class EmptyBoard(val wallsPerRow:Array<Array<Boolean>>,
 
 data class GameState(val board:EmptyBoard, val robots:Map<Coord, Robot>) {
 
+    var moves: List<Move> = ArrayList()
+
+    constructor(board: EmptyBoard, robots: Map<Coord, Robot>, moves: List<Move>):  this(board, robots) {
+        this.moves = moves
+    }
+
     fun isPassable(c: Coord, direction: Direction): Boolean {
         return !(when(direction) {
             Direction.UP -> board.wallsPerCol[c.x][c.y + 1] || robots.contains(Coord(c.x, c.y + 1))
             Direction.DOWN -> board.wallsPerCol[c.x][c.y] || robots.contains(Coord(c.x, c.y - 1))
             Direction.LEFT ->  board.wallsPerRow[c.y][c.x] || robots.contains(Coord(c.x - 1, c.y))
-            Direction.RIGHT ->  board.wallsPerRow[c.y][c.x + 1] || robots.contains(Coord(c.x + 1, c.y + 1))
+            Direction.RIGHT ->  board.wallsPerRow[c.y][c.x + 1] || robots.contains(Coord(c.x + 1, c.y))
         })
     }
 }
