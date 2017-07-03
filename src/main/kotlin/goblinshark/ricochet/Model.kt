@@ -8,6 +8,12 @@ data class Coord(val x:Int, val y:Int) {
     fun move(d: Direction): Coord {
         return Coord(x + d.x, y + d.y)
     }
+
+    // Performance hack.
+    // Assumes board is no larger than 16 x 16
+    override fun hashCode(): Int {
+        return x shl 4 or y
+    }
 }
 
 // Assumes coordinate system with origin in lower-left.
@@ -82,4 +88,51 @@ data class GameState(val board:EmptyBoard, val robots:Map<Coord, Robot>) {
             Direction.RIGHT ->  board.wallsPerRow[c.y][c.x + 1] || robots.contains(Coord(c.x + 1, c.y))
         })
     }
+
+    // Performance hack.
+    // Assumes board is no larger than 16 x 16
+    // Assumes only compared to states sharing the same EmptyBoard.
+    override fun hashCode(): Int {
+        return encode().hashCode()
+    }
+
+    fun encode():Long {
+        var result = 0L
+        robots.forEach({e -> result = result or encode(e)})
+        return result
+    }
+
+    fun encode(e:Map.Entry<Coord, Robot>): Long {
+        return when (e.value.color) {
+            Color.BLACK -> encode(0, e.key)
+            Color.BLUE -> encode(1, e.key)
+            Color.GREEN -> encode(2, e.key)
+            Color.RED -> encode(3, e.key)
+            Color.YELLOW -> encode(4, e.key)
+            else -> throw IllegalStateException()
+        }
+    }
+
+    fun encode(offset:Int, c:Coord):Long {
+        return (c.x.toLong() shl (offset * 8)) or (c.y.toLong() shl (offset * 8 + 4))
+    }
+}
+
+fun main(args: Array<String>) {
+    val b: EmptyBoard = BoardBuilder(SIMPLE_BLUE_MOON, SIMPLE_BLUE_PLANET, SIMPLE_BLUE_STAR, SIMPLE_BLUE_SUN).Build()
+    val robot = hashMapOf<Coord, Robot>(
+            Coord(13, 3) to Robot(Color.BLUE),
+            Coord(3, 3) to Robot(Color.RED),
+            Coord(13, 8) to Robot(Color.GREEN),
+            Coord(5, 14) to Robot(Color.YELLOW),
+            Coord(1, 14) to Robot(Color.BLACK)
+    )
+
+    val s1 = GameState(b, robot)
+    val r2 = HashMap(robot)
+    r2.remove(Coord(1, 14))
+    val s2 = GameState(b, r2)
+
+    println(s1.encode())
+    println(s2.encode())
 }
